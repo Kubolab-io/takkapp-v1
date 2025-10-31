@@ -34,12 +34,6 @@ export default function TabLayout() {
             title: 'Perfil',
           }}
         />
-        <Tabs.Screen
-          name="misplanes"
-          options={{
-            title: 'Mis Planes',
-          }}
-        />
       </Tabs>
       <CustomTabBar />
     </>
