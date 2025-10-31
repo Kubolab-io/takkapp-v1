@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
+    Image,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -16,6 +17,18 @@ import {
     View
 } from 'react-native';
 import { auth, db } from '../firebaseconfig';
+
+// Función helper para obtener imágenes predeterminadas
+const getDefaultImage = (imageKey: string) => {
+  const imageMap: { [key: string]: any } = {
+    cocina: require('@/assets/images/planes/cocina.jpg'),
+    art: require('@/assets/images/planes/art.jpg'),
+    concert: require('@/assets/images/planes/concert.jpg'),
+    running: require('@/assets/images/planes/Running.jpg'),
+    senderismo: require('@/assets/images/planes/senderismo.jpg'),
+  };
+  return imageMap[imageKey] || imageMap.art;
+};
 
 export default function ActividadDetalle() {
   const params = useLocalSearchParams();
@@ -299,7 +312,7 @@ export default function ActividadDetalle() {
         <View style={styles.mainCard}>
           <View style={styles.cardHeader}>
             <View style={styles.planTitleContainer}>
-              <Text style={styles.planEmoji}>{actividad.emoji || '🎯'}</Text>
+              <Text style={styles.planEmoji}>{actividad.emoji || actividad.activityType || '🎯'}</Text>
               <View style={styles.planInfo}>
                 <Text style={styles.planTitle}>{actividad.title}</Text>
                 <Text style={styles.planCreator}>
@@ -313,6 +326,25 @@ export default function ActividadDetalle() {
               </Text>
             </View>
           </View>
+
+          {/* Imagen de la Actividad */}
+          {(actividad.image || actividad.imageUrl || actividad.defaultImageKey) && (
+            <View style={styles.activityImageContainer}>
+              <Image
+                source={
+                  actividad.image 
+                    ? { uri: actividad.image }
+                    : actividad.imageUrl
+                    ? { uri: actividad.imageUrl }
+                    : actividad.defaultImageKey
+                    ? getDefaultImage(actividad.defaultImageKey)
+                    : require('@/assets/images/planes/art.jpg')
+                }
+                style={styles.activityImage}
+                resizeMode="cover"
+              />
+            </View>
+          )}
 
           <View style={styles.planDetails}>
             <View style={styles.detailRow}>
@@ -594,6 +626,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#0369a1',
     fontWeight: '600',
+  },
+  activityImageContainer: {
+    width: '100%',
+    height: 200,
+    marginBottom: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  activityImage: {
+    width: '100%',
+    height: '100%',
   },
   planDetails: {
     marginBottom: 16,
