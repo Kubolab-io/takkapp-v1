@@ -392,7 +392,7 @@ export default function TabFourScreen() {
           >
             <Ionicons name="search-outline" size={20} color={Colors.textSecondary} />
             <ThemedText variant="body" color="textSecondary" style={styles.searchPlaceholder}>
-              Busca actividades...
+              ¿Qué quieres hacer hoy?
             </ThemedText>
           </TouchableOpacity>
         </View>
