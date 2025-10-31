@@ -32,8 +32,36 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
 
 # typescript
 *.tsbuildinfo
 
 app-example
+
+# Firebase sensitive files
+firebaseconfig.ts
+firebase-admin-config.js
+.firebaserc
+
+# Google API Keys
+src/config/googlePlaces.js
+
+# Documentation (optional - uncomment if you want to exclude from repo)
+# *.md
+
+# Legal documents (Word files)
+assets/legal/*.docx
+
+# iOS build files
+ios/Pods/
+ios/.xcode.env.local
+ios/Podfile.lock
+
+# Android build files
+android/.gradle/
+android/app/build/
+android/build/
+
+# Development scripts (optional - uncomment if you want to exclude)
+# scripts/
