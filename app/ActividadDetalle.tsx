@@ -312,7 +312,22 @@ export default function ActividadDetalle() {
         <View style={styles.mainCard}>
           <View style={styles.cardHeader}>
             <View style={styles.planTitleContainer}>
-              <Text style={styles.planEmoji}>{actividad.emoji || actividad.activityType || '🎯'}</Text>
+              {/* Foto de perfil circular del plan */}
+              <View style={styles.planAvatarContainer}>
+                <Image
+                  source={
+                    actividad.image 
+                      ? { uri: actividad.image }
+                      : actividad.imageUrl
+                      ? { uri: actividad.imageUrl }
+                      : actividad.defaultImageKey
+                      ? getDefaultImage(actividad.defaultImageKey)
+                      : require('@/assets/images/planes/art.jpg')
+                  }
+                  style={styles.planAvatar}
+                  resizeMode="cover"
+                />
+              </View>
               <View style={styles.planInfo}>
                 <Text style={styles.planTitle}>{actividad.title}</Text>
                 <Text style={styles.planCreator}>
@@ -326,25 +341,6 @@ export default function ActividadDetalle() {
               </Text>
             </View>
           </View>
-
-          {/* Imagen de la Actividad */}
-          {(actividad.image || actividad.imageUrl || actividad.defaultImageKey) && (
-            <View style={styles.activityImageContainer}>
-              <Image
-                source={
-                  actividad.image 
-                    ? { uri: actividad.image }
-                    : actividad.imageUrl
-                    ? { uri: actividad.imageUrl }
-                    : actividad.defaultImageKey
-                    ? getDefaultImage(actividad.defaultImageKey)
-                    : require('@/assets/images/planes/art.jpg')
-                }
-                style={styles.activityImage}
-                resizeMode="cover"
-              />
-            </View>
-          )}
 
           <View style={styles.planDetails}>
             <View style={styles.detailRow}>
@@ -597,9 +593,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  planEmoji: {
-    fontSize: 24,
+  planAvatarContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    overflow: 'hidden',
     marginRight: 12,
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
+  },
+  planAvatar: {
+    width: '100%',
+    height: '100%',
   },
   planInfo: {
     flex: 1,
@@ -626,17 +631,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#0369a1',
     fontWeight: '600',
-  },
-  activityImageContainer: {
-    width: '100%',
-    height: 200,
-    marginBottom: 16,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  activityImage: {
-    width: '100%',
-    height: '100%',
   },
   planDetails: {
     marginBottom: 16,
