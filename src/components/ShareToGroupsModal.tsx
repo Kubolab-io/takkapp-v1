@@ -67,7 +67,7 @@ export const ShareToGroupsModal: React.FC<ShareToGroupsModalProps> = ({
   user
 }) => {
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-  const { groups, loading } = useGroups(user);
+  const { myGroups, loading } = useGroups(user);
 
   const handleGroupSelect = (groupId: string) => {
     setSelectedGroups(prev => 
@@ -83,7 +83,7 @@ export const ShareToGroupsModal: React.FC<ShareToGroupsModalProps> = ({
     try {
       // Solo navegar al primer grupo seleccionado para evitar múltiples navegaciones
       const firstGroupId = selectedGroups[0];
-      const group = groups.find(g => g.id === firstGroupId);
+      const group = myGroups.find(g => g.id === firstGroupId);
       
       if (group) {
         // Crear mensaje de plan compartido
@@ -183,7 +183,7 @@ export const ShareToGroupsModal: React.FC<ShareToGroupsModalProps> = ({
             <View style={styles.loadingContainer}>
               <Text style={styles.loadingText}>Cargando grupos...</Text>
             </View>
-          ) : groups.length === 0 ? (
+          ) : myGroups.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyStateEmoji}>👥</Text>
               <Text style={styles.emptyStateTitle}>No tienes grupos</Text>
@@ -193,7 +193,7 @@ export const ShareToGroupsModal: React.FC<ShareToGroupsModalProps> = ({
             </View>
           ) : (
             <FlatList
-              data={groups}
+              data={myGroups}
               keyExtractor={(item) => item.id}
               renderItem={renderGroupItem}
               style={styles.groupsList}
