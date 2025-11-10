@@ -573,23 +573,13 @@ export default function TabFourScreen() {
                 <>
                   {/* Sección de Actividades Destacadas */}
                   {featuredPlans.length > 0 && (
-                    <View style={styles.featuredSection}>
-                      <View style={styles.sectionHeader}>
-                        <ThemedText variant="h3" color="textPrimary">
-                          Actividades Destacadas
-                        </ThemedText>
-                        <ThemedText variant="caption" color="textSecondary">
-                          {featuredPlans.length} actividades
-                        </ThemedText>
-                      </View>
-                      <FeaturedActivities
-                        featuredPlans={featuredPlans}
-                        selectedCity={selectedCity}
-                        selectedActivityType="Todos"
-                        activityTypes={[]}
-                        onOpenActivityDetails={openActivityDetails}
-                      />
-                    </View>
+                    <FeaturedActivities
+                      featuredPlans={featuredPlans}
+                      selectedCity={selectedCity}
+                      selectedActivityType="Todos"
+                      activityTypes={[]}
+                      onOpenActivityDetails={openActivityDetails}
+                    />
                   )}
 
                   {/* Lista de Actividades */}

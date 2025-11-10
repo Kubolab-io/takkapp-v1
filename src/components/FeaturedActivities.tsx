@@ -1,13 +1,15 @@
 /**
  * FeaturedActivities.tsx
- * Componente para mostrar las actividades destacadas
+ * Componente para mostrar las actividades destacadas en slider horizontal
  */
 
 import { Colors } from '@/src/constants/Colors';
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
     Dimensions,
     FlatList,
+    Image,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -15,6 +17,7 @@ import {
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
+const CARD_WIDTH = width * 0.75;
 
 interface FeaturedActivitiesProps {
   featuredPlans: any[];
@@ -23,6 +26,18 @@ interface FeaturedActivitiesProps {
   activityTypes: { id: string; label: string; emoji: string }[];
   onOpenActivityDetails: (item: any) => void;
 }
+
+// Helper para obtener imagen por defecto según la clave
+const getDefaultImage = (imageKey?: string) => {
+  const images: { [key: string]: any } = {
+    art: require('@/assets/images/planes/art.jpg'),
+    cooking: require('@/assets/images/planes/cocina.jpg'),
+    concert: require('@/assets/images/planes/concert.jpg'),
+    running: require('@/assets/images/planes/Running.jpg'),
+    hiking: require('@/assets/images/planes/senderismo.jpg'),
+  };
+  return images[imageKey || 'art'] || images.art;
+};
 
 export const FeaturedActivities: React.FC<FeaturedActivitiesProps> = ({
   featuredPlans,
@@ -37,17 +52,58 @@ export const FeaturedActivities: React.FC<FeaturedActivitiesProps> = ({
       onPress={() => onOpenActivityDetails(item)}
       activeOpacity={0.9}
     >
-      <View style={styles.featuredCardBadge}>
-        <Text style={styles.featuredCardEmoji}>{item.emoji || '🎯'}</Text>
-      </View>
-      <View style={styles.featuredCardContent}>
-        <Text style={styles.featuredCardTitle} numberOfLines={1}>{item.title}</Text>
-        <Text style={styles.featuredCardSubtitle}>{item.author}</Text>
-        <View style={styles.featuredCardInfo}>
-          <Text style={styles.featuredCardInfoText}>📍 {item.location}</Text>
-          <Text style={styles.featuredCardInfoText}>{item.participants}/{item.maxParticipants} personas</Text>
+      {/* Imagen de fondo */}
+      <Image
+        source={
+          item.image 
+            ? { uri: item.image }
+            : item.imageUrl
+            ? { uri: item.imageUrl }
+            : item.defaultImageKey
+            ? getDefaultImage(item.defaultImageKey)
+            : require('@/assets/images/planes/art.jpg')
+        }
+        style={styles.featuredCardImage}
+        resizeMode="cover"
+      />
+      
+      {/* Overlay con gradiente */}
+      <LinearGradient
+        colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.7)']}
+        style={styles.featuredCardOverlay}
+      >
+        {/* Badge destacado */}
+        <View style={styles.featuredBadge}>
+          <Text style={styles.featuredBadgeText}>⭐ Destacado</Text>
         </View>
-      </View>
+        
+        {/* Contenido */}
+        <View style={styles.featuredCardContent}>
+          <Text style={styles.featuredCardTitle} numberOfLines={2}>{item.title}</Text>
+          <Text style={styles.featuredCardAuthor} numberOfLines={1}>
+            Por {item.author || 'Usuario'}
+          </Text>
+          
+          <View style={styles.featuredCardInfoRow}>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoIcon}>📍</Text>
+              <Text style={styles.infoText} numberOfLines={1}>{item.location || 'Ubicación'}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoIcon}>👥</Text>
+              <Text style={styles.infoText}>
+                {item.participants || 0}/{item.maxParticipants || 0}
+              </Text>
+            </View>
+          </View>
+          
+          {item.activityType && (
+            <View style={styles.typeChip}>
+              <Text style={styles.typeChipText}>{item.activityType}</Text>
+            </View>
+          )}
+        </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
 
@@ -58,23 +114,23 @@ export const FeaturedActivities: React.FC<FeaturedActivitiesProps> = ({
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>
-          {selectedCity === 'Todas' && selectedActivityType === 'Todos' 
-            ? 'Planes Destacados' 
-            : `Planes Destacados${selectedCity !== 'Todas' ? ` en ${selectedCity}` : ''}${selectedActivityType !== 'Todos' ? ` - ${activityTypes.find(t => t.id === selectedActivityType)?.label}` : ''}`
-          }
-        </Text>
-        <TouchableOpacity>
-          <Text style={styles.sectionLink}>Ver todos</Text>
-        </TouchableOpacity>
+        <View>
+          <Text style={styles.sectionTitle}>✨ Planes Destacados</Text>
+          <Text style={styles.sectionSubtitle}>
+            {featuredPlans.length} {featuredPlans.length === 1 ? 'plan increíble' : 'planes increíbles'}
+          </Text>
+        </View>
       </View>
       <FlatList
-        data={featuredPlans.slice(0, 3)}
+        data={featuredPlans}
         renderItem={renderFeaturedCard}
         keyExtractor={(item) => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.featuredList}
+        snapToInterval={CARD_WIDTH + 16}
+        decelerationRate="fast"
+        pagingEnabled={false}
       />
     </View>
   );
@@ -82,69 +138,129 @@ export const FeaturedActivities: React.FC<FeaturedActivitiesProps> = ({
 
 const styles = StyleSheet.create({
   section: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: 20,
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#000000',
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#1E3A8A',
+    marginBottom: 4,
   },
-  sectionLink: {
+  sectionSubtitle: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#000000',
+    fontWeight: '500',
+    color: '#64748B',
   },
   featuredList: {
     paddingHorizontal: 20,
-    gap: 16,
+    paddingVertical: 4,
   },
   featuredCard: {
-    width: width * 0.65,
-    backgroundColor: Colors.background,
-    borderRadius: 20,
-    padding: 20,
+    width: CARD_WIDTH,
+    height: 280,
+    borderRadius: 24,
     marginRight: 16,
-    borderWidth: 1,
-    borderColor: Colors.primary,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    shadowColor: '#1E3A8A',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 10,
   },
-  featuredCardBadge: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    backgroundColor: Colors.secondary + '20',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
+  featuredCardImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
   },
-  featuredCardEmoji: {
-    fontSize: 24,
+  featuredCardOverlay: {
+    flex: 1,
+    justifyContent: 'space-between',
+    padding: 20,
+  },
+  featuredBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255, 215, 0, 0.95)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  featuredBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#1E3A8A',
   },
   featuredCardContent: {
-    flex: 1,
+    gap: 8,
   },
   featuredCardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#000000',
-    marginBottom: 4,
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+    lineHeight: 28,
   },
-  featuredCardSubtitle: {
+  featuredCardAuthor: {
     fontSize: 14,
-    color: '#000000',
-    marginBottom: 12,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    opacity: 0.9,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
-  featuredCardInfo: {
-    gap: 4,
+  featuredCardInfoRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 4,
   },
-  featuredCardInfoText: {
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    gap: 6,
+    flex: 1,
+  },
+  infoIcon: {
+    fontSize: 14,
+  },
+  infoText: {
     fontSize: 13,
-    color: '#000000',
+    fontWeight: '600',
+    color: '#FFFFFF',
+    flex: 1,
+  },
+  typeChip: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(30, 58, 138, 0.9)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginTop: 4,
+  },
+  typeChipText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });
