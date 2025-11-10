@@ -65,8 +65,13 @@ export default function RomperHieloScreen() {
     joinGroup,
     findGroupById,
     getGroupsByCity,
-    getAvailableCities
+    getAvailableCities,
+    groups
   } = useGroups(user);
+
+  // 📊 Calcular límites de grupos
+  const groupsCreatedByUser = groups.filter(g => g.createdBy === user?.uid && !g.isPlanChat).length;
+  const totalUserGroups = groups.filter(g => g.members.includes(user?.uid || '') && !g.isPlanChat).length;
 
   // Hook para notificaciones globales de chat
   useGlobalChatNotifications(user);
@@ -448,13 +453,38 @@ export default function RomperHieloScreen() {
 
       {/* Barra de crear chat/grupo */}
       {!showCommunityView && (
-        <TouchableOpacity 
-          style={styles.createChatBar}
-          onPress={() => setShowCreateGroup(true)}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.createChatText}>Crear Chat</Text>
-        </TouchableOpacity>
+        <View>
+          <TouchableOpacity 
+            style={styles.createChatBar}
+            onPress={() => setShowCreateGroup(true)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.createChatText}>Crear Chat</Text>
+          </TouchableOpacity>
+          
+          {/* 📊 Indicador de límites */}
+          <View style={styles.limitsContainer}>
+            <View style={styles.limitItem}>
+              <Text style={styles.limitLabel}>Grupos creados:</Text>
+              <Text style={[
+                styles.limitValue,
+                groupsCreatedByUser >= 3 && styles.limitValueWarning
+              ]}>
+                {groupsCreatedByUser}/3
+              </Text>
+            </View>
+            <View style={styles.limitSeparator} />
+            <View style={styles.limitItem}>
+              <Text style={styles.limitLabel}>Total grupos:</Text>
+              <Text style={[
+                styles.limitValue,
+                totalUserGroups >= 15 && styles.limitValueWarning
+              ]}>
+                {totalUserGroups}/15
+              </Text>
+            </View>
+          </View>
+        </View>
       )}
 
       {/* Botones de filtro de tipo de chat */}
@@ -832,6 +862,44 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  // 📊 Estilos para indicador de límites
+  limitsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginTop: -8,
+    marginBottom: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  limitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  limitLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#64748B',
+  },
+  limitValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1E3A8A',
+  },
+  limitValueWarning: {
+    color: '#DC2626',
+  },
+  limitSeparator: {
+    width: 1,
+    height: 20,
+    backgroundColor: '#E2E8F0',
   },
   content: {
     flex: 1,

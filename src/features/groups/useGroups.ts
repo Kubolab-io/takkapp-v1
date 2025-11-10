@@ -128,6 +128,12 @@ export const useGroups = (user: User | null) => {
       throw new Error('La ciudad es obligatoria para crear un grupo');
     }
 
+    // 🔒 LÍMITE: Verificar que el usuario no haya creado más de 3 grupos
+    const groupsCreatedByUser = groups.filter(g => g.createdBy === user.uid && !g.isPlanChat);
+    if (groupsCreatedByUser.length >= 3) {
+      throw new Error('Has alcanzado el límite máximo de 3 grupos creados. Elimina uno para crear otro.');
+    }
+
     try {
       const groupId = generateGroupId();
       
@@ -147,6 +153,10 @@ export const useGroups = (user: User | null) => {
       return { docId: docRef.id, groupId: groupId };
     } catch (err) {
       console.error('Error creando grupo:', err);
+      // Propagar errores de validación tal cual
+      if (err instanceof Error && err.message.includes('límite máximo')) {
+        throw err;
+      }
       throw new Error('No se pudo crear el grupo');
     }
   };
@@ -155,6 +165,15 @@ export const useGroups = (user: User | null) => {
   const joinGroup = async (groupId: string) => {
     if (!user) {
       throw new Error('Usuario no autenticado');
+    }
+
+    // 🔒 LÍMITE: Verificar que el usuario no esté en más de 15 grupos (sin contar chats de planes)
+    const userGroupsCount = groups.filter(g => 
+      g.members.includes(user.uid) && !g.isPlanChat
+    ).length;
+    
+    if (userGroupsCount >= 15) {
+      throw new Error('Has alcanzado el límite máximo de 15 grupos. Sal de un grupo para unirte a otro.');
     }
 
     try {
