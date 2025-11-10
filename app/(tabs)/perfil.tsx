@@ -253,6 +253,40 @@ const TabOneScreen = React.memo(function TabOneScreen() {
 
         </View>
 
+        {/* 🎯 Tarjeta de Tokens */}
+        <View style={styles.tokensCard}>
+          <View style={styles.tokensHeader}>
+            <View style={styles.tokensIconContainer}>
+              <Text style={styles.tokensIcon}>⭐</Text>
+            </View>
+            <View style={styles.tokensInfo}>
+              <Text style={styles.tokensTitle}>Tokens de Destacado</Text>
+              <Text style={styles.tokensSubtitle}>Destaca tus planes por 24 horas</Text>
+            </View>
+          </View>
+          
+          <View style={styles.tokensCountContainer}>
+            <Text style={styles.tokensCount}>{profile.highlightTokens || 0}</Text>
+            <Text style={styles.tokensLabel}>tokens disponibles</Text>
+          </View>
+          
+          <TouchableOpacity 
+            style={styles.buyTokensButton}
+            onPress={() => Alert.alert(
+              '💳 Comprar Tokens',
+              'Próximamente podrás comprar más tokens para destacar tus planes.\n\n🎯 1 Token = 24 horas destacado\n\nMantente atento a las actualizaciones!',
+              [{ text: 'Entendido', style: 'default' }]
+            )}
+          >
+            <Text style={styles.buyTokensIcon}>💳</Text>
+            <Text style={styles.buyTokensText}>Comprar Tokens</Text>
+          </TouchableOpacity>
+          
+          <Text style={styles.tokensHelpText}>
+            Cada token te permite destacar un plan por 24 horas en la sección de destacados
+          </Text>
+        </View>
+
         {/* Tarjeta unificada de información personal */}
         <View style={styles.unifiedCard}>
           <View style={styles.cardHeader}>
@@ -537,6 +571,102 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 4,
+  },
+  // 🎯 Estilos para tarjeta de tokens
+  tokensCard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.2)',
+  },
+  tokensHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  tokensIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  tokensIcon: {
+    fontSize: 32,
+  },
+  tokensInfo: {
+    flex: 1,
+  },
+  tokensTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1E3A8A',
+    marginBottom: 4,
+  },
+  tokensSubtitle: {
+    fontSize: 14,
+    color: '#64748B',
+    fontWeight: '500',
+  },
+  tokensCountContainer: {
+    alignItems: 'center',
+    paddingVertical: 24,
+    backgroundColor: 'rgba(255, 215, 0, 0.05)',
+    borderRadius: 16,
+    marginBottom: 16,
+  },
+  tokensCount: {
+    fontSize: 56,
+    fontWeight: '800',
+    color: '#FFD700',
+    marginBottom: 4,
+  },
+  tokensLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#64748B',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  buyTokensButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1E3A8A',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    marginBottom: 12,
+    shadowColor: '#1E3A8A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  buyTokensIcon: {
+    fontSize: 20,
+    marginRight: 8,
+  },
+  buyTokensText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  tokensHelpText: {
+    fontSize: 13,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 18,
+    paddingHorizontal: 8,
   },
   avatarLarge: {
     width: 85,

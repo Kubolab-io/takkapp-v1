@@ -451,7 +451,29 @@ const processedPostsData = useMemo(() => {
   });
   
   // Separar posts destacados de posts normales
-  const featured = postsData.filter(post => post.isFeatured === true);
+  // 🎯 Filtrar destacados que no hayan expirado (24 horas)
+  const now = new Date();
+  const featured = postsData.filter(post => {
+    if (!post.isFeatured) return false;
+    
+    // Si tiene fecha de expiración, verificar si ya expiró
+    if (post.featuredExpiresAt) {
+      const expiresAt = post.featuredExpiresAt.toDate 
+        ? post.featuredExpiresAt.toDate() 
+        : new Date(post.featuredExpiresAt.seconds * 1000);
+      
+      if (now >= expiresAt) {
+        console.log('⏰ Plan destacado expirado:', post.title, {
+          expiresAt: expiresAt.toISOString(),
+          now: now.toISOString()
+        });
+        return false; // Excluir de destacados si ya expiró
+      }
+    }
+    
+    return true;
+  });
+  
   const normal = postsData.filter(post => !post.isFeatured);
   
   // Ordenar posts destacados por fecha de destacado
