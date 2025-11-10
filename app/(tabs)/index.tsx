@@ -284,6 +284,9 @@ export default function TabFourScreen() {
     setActivityImage,
     showImagePicker,
     setShowImagePicker,
+    shouldHighlight,
+    setShouldHighlight,
+    userTokens,
     showCommentsModal,
     selectedPost,
     comments,
@@ -541,6 +544,38 @@ export default function TabFourScreen() {
                       ))}
                     </ScrollView>
                   </View>
+                  
+                  {/* 🎯 Opción de destacar plan */}
+                  <TouchableOpacity 
+                    style={styles.highlightContainer}
+                    onPress={() => userTokens > 0 && setShouldHighlight(!shouldHighlight)}
+                    activeOpacity={0.7}
+                    disabled={userTokens === 0}
+                  >
+                    <View style={[
+                      styles.checkbox,
+                      shouldHighlight && styles.checkboxChecked,
+                      userTokens === 0 && styles.checkboxDisabled
+                    ]}>
+                      {shouldHighlight && (
+                        <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+                      )}
+                    </View>
+                    <View style={styles.highlightTextContainer}>
+                      <Text style={[
+                        styles.highlightText,
+                        userTokens === 0 && styles.highlightTextDisabled
+                      ]}>
+                        ⭐ Destacar este plan por 24 horas
+                      </Text>
+                      <Text style={[
+                        styles.highlightTokens,
+                        userTokens === 0 && styles.highlightTokensEmpty
+                      ]}>
+                        {userTokens > 0 ? `Tienes ${userTokens} token${userTokens !== 1 ? 's' : ''}` : 'No tienes tokens'}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                   
                   {/* Botones */}
                   <View style={styles.formActions}>
@@ -1111,6 +1146,57 @@ const styles = StyleSheet.create({
   },
   activityTypeTextActive: {
     color: Colors.white,
+  },
+  // 🎯 Estilos para destacar plan
+  highlightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    borderRadius: BorderRadius.md,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    marginBottom: Spacing.md,
+    gap: Spacing.sm,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#FFD700',
+    backgroundColor: Colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#FFD700',
+    borderColor: '#FFD700',
+  },
+  checkboxDisabled: {
+    borderColor: '#CCCCCC',
+    backgroundColor: '#F5F5F5',
+  },
+  highlightTextContainer: {
+    flex: 1,
+    gap: 4,
+  },
+  highlightText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+  },
+  highlightTextDisabled: {
+    color: '#999999',
+  },
+  highlightTokens: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#FFD700',
+  },
+  highlightTokensEmpty: {
+    color: '#DC2626',
   },
   formActions: {
     flexDirection: 'row',

@@ -83,6 +83,7 @@ export const useOnboarding = () => {
         email: user.email,
         photoURL: user.photoURL,
         onboardingComplete: false, // Se marcará como completo al final
+        highlightTokens: 2, // 🎯 Tokens para destacar planes (default: 2)
         createdAt: new Date(),
         updatedAt: new Date()
       }, { merge: true });

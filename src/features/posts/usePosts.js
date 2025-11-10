@@ -210,6 +210,9 @@ const [activityType, setActivityType] = useState("");
 const [maxParticipants, setMaxParticipants] = useState("");
 const [activityImage, setActivityImage] = useState(null);
 const [showImagePicker, setShowImagePicker] = useState(false);
+// 🎯 Estados para destacar planes
+const [shouldHighlight, setShouldHighlight] = useState(false);
+const [userTokens, setUserTokens] = useState(0);
 
 // Estados para comentarios
 const [showCommentsModal, setShowCommentsModal] = useState(false);
@@ -284,6 +287,29 @@ const isFutureDate = (dateValue) => {
     return false;
   }
 };
+
+// 🎯 Cargar tokens del usuario
+useEffect(() => {
+  if (!user) {
+    setUserTokens(0);
+    return;
+  }
+
+  const loadUserTokens = async () => {
+    try {
+      const userDoc = await getDoc(doc(db, 'userProfiles', user.uid));
+      if (userDoc.exists()) {
+        const tokens = userDoc.data().highlightTokens || 0;
+        setUserTokens(tokens);
+        console.log('🎯 Tokens del usuario:', tokens);
+      }
+    } catch (error) {
+      console.error('Error cargando tokens:', error);
+    }
+  };
+
+  loadUserTokens();
+}, [user]);
 
 // Escuchar posts en tiempo real
 useEffect(() => {
@@ -671,6 +697,10 @@ const handlePost = async () => {
         }
       }
 
+      // 🎯 Calcular fecha de expiración si se va a destacar (24 horas desde ahora)
+      const now = new Date();
+      const expirationDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 horas en milisegundos
+      
       const activityData = {
         title: activityTitle.trim(),
         content: activityDescription.trim(),
@@ -691,10 +721,31 @@ const handlePost = async () => {
         availableSlots: numParticipants - 1, // Cupos disponibles (excluyendo al creador)
         author: getDisplayName(user),
         authorEmail: user.email || '',
-        authorId: user.uid || ''
+        authorId: user.uid || '',
+        // 🎯 Campos de destacado
+        isFeatured: shouldHighlight && userTokens > 0, // Solo destacar si tiene tokens
+        featuredAt: shouldHighlight && userTokens > 0 ? serverTimestamp() : null,
+        featuredBy: shouldHighlight && userTokens > 0 ? user.uid : null,
+        featuredExpiresAt: shouldHighlight && userTokens > 0 ? Timestamp.fromDate(expirationDate) : null
       };
       
       const docRef = await addDoc(collection(db, "posts"), activityData);
+      
+      // 🎯 Si se destacó el plan, consumir un token
+      if (shouldHighlight && userTokens > 0) {
+        try {
+          const userRef = doc(db, 'userProfiles', user.uid);
+          await updateDoc(userRef, {
+            highlightTokens: userTokens - 1,
+            updatedAt: new Date()
+          });
+          setUserTokens(userTokens - 1); // Actualizar estado local
+          console.log('🎯 Token consumido. Tokens restantes:', userTokens - 1);
+        } catch (tokenError) {
+          console.error('⚠️ Error consumiendo token:', tokenError);
+          // No bloquear la creación del plan por esto
+        }
+      }
 
       // Auto-inscribir al creador en su propia actividad
       try {
@@ -757,9 +808,13 @@ const handlePost = async () => {
       setActivityType("");
       setMaxParticipants("");
       setActivityImage(null);
+      setShouldHighlight(false); // 🎯 Resetear checkbox de destacado
       setShowCreateForm(false);
       
-      Alert.alert("✅ Éxito", "Actividad creada correctamente");
+      const successMessage = shouldHighlight && userTokens > 0 
+        ? "Actividad creada y destacada por 24 horas ⭐" 
+        : "Actividad creada correctamente";
+      Alert.alert("✅ Éxito", successMessage);
       
     } catch (error) {
       console.error("❌ Error guardando actividad:", error);
@@ -1019,6 +1074,10 @@ return {
   setActivityImage,
   showImagePicker,
   setShowImagePicker,
+  // 🎯 Estados de destacado
+  shouldHighlight,
+  setShouldHighlight,
+  userTokens,
   
   // Estados para comentarios
   showCommentsModal,
